@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/paging.dir/main.cpp.o  -o paging 
