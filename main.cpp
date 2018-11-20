@@ -9,24 +9,40 @@ using namespace std;
 
 int main() {
     int frame_number;
-    cout << "Please enter frame number" << std::endl;
+    cout << "Frame Number: ";
     cin >> frame_number;
     Pager pager(frame_number);
 
-    char option;
-    cin >> option;
-
+    cout << "Reference Sequence: ";
     string file_path;
     cin >> file_path;
 
-    int faults = pager.fifo(file_path);
-    cout << "The page fault amount for fifo is " << faults << endl;
+    cout << "Algorithm to use. Options are A. FIFO, B. LRU, C. Optimal: ";
+    char option;
+    cin >> option;
 
-    int faults2 = pager.lru(file_path);
-    cout << "The page fault amount for lru is " << faults2 << endl;
+    int faults;
 
-    int faults3 = pager.optimal(file_path);
-    cout << "The page fault amount for optimal is " << faults3 << endl;
+    switch (option){
+        case 'a':
+        case 'A':
+            faults = pager.fifo(file_path);
+            break;
+        case 'b':
+        case 'B':
+            faults = pager.lru(file_path);
+            break;
+        case 'c':
+        case 'C':
+            faults = pager.optimal(file_path);
+            break;
+        default:
+            cout << "Option not recognized" << endl;
+            return 0;
+
+    }
+
+    cout << "The page fault amount is " << faults << endl;
 
     return 0;
 }

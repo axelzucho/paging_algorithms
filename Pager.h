@@ -35,7 +35,8 @@ private:
             if(it.second == -1) continue;
             char replaced_key = it.first;
             int replaced_frame = it.second;
-            it.second = -1;
+            //it.second = -1;
+            processes_in_frames[replaced_key] = -1;
             processes_in_frames[process] = replaced_frame;
 
             results.push_back(min_path(processes, index, processes_in_frames, steps + replaced_key));
