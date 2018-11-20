@@ -9,6 +9,7 @@
 #include <fstream>
 #include <queue>
 #include <unordered_map>
+#include <tuple>
 
 using namespace std;
 
@@ -18,35 +19,47 @@ struct OrderBySecond
 };
 typedef std::priority_queue<pair<char,int>, std::vector<pair<char,int>>, OrderBySecond> recently_used_queue;
 
+typedef tuple<int, unordered_map<char, int>, string> optimal_tuple;
+
+struct OptimalMethodStruct{
+    bool operator() (const optimal_tuple &a, const optimal_tuple &b) { return get<2>(a).length() < get<2>(b).length(); }
+};
+typedef std::priority_queue<tuple<int, unordered_map<char, int>, string>, std::vector<tuple<int, unordered_map<char, int>, string>>, OptimalMethodStruct> optimal_queue;
+
 class Pager {
 private:
     int frame_number_;
     pair <int, string> min_path(const string& processes, int index, unordered_map<char, int> processes_in_frames, string steps){
-        if(index >= processes.length()) return {0, steps};
-        char process = processes[index];
-        while(processes_in_frames.find(process) != processes_in_frames.end() && processes_in_frames[process] != -1){
-            //cout << "Process " << process << " is already in frame " << processes_in_frames[process] << endl;
-            if(++index >= processes.length()) return {0, steps};
-            process = processes[index];
-        }
-        ++index;
-        vector<pair<int, string>> results;
-        for(auto it:processes_in_frames){
-            if(it.second == -1) continue;
-            char replaced_key = it.first;
-            int replaced_frame = it.second;
-            //it.second = -1;
-            processes_in_frames[replaced_key] = -1;
-            processes_in_frames[process] = replaced_frame;
+        optimal_queue queue;
+        queue.push(make_tuple(index, processes_in_frames, steps));
+        while(!queue.empty()){
+            optimal_tuple top_tuple = queue.top();
+            queue.pop();
 
-            results.push_back(min_path(processes, index, processes_in_frames, steps + replaced_key));
-            it.second = replaced_frame;
+            int tup_index = get<0>(top_tuple);
+            unordered_map<char, int> tup_map = get<1>(top_tuple);
+            string tup_steps = get<2>(top_tuple);
+
+            if(tup_index >= processes.length()) return {tup_steps.length(), tup_steps};
+            char process = processes[tup_index];
+            while(tup_map.find(process) != tup_map.end() && tup_map[process] != -1){
+                if(++tup_index >= processes.length()) return {tup_steps.length(), tup_steps};
+                process = processes[tup_index];
+            }
+            ++tup_index;
+            vector<pair<int, string>> results;
+            for(auto& it:tup_map){
+                if(it.second == -1) continue;
+                char replaced_key = it.first;
+                int replaced_frame = it.second;
+                it.second = -1;
+                tup_map[process] = replaced_frame;
+
+                queue.push(make_tuple(tup_index, tup_map, tup_steps + replaced_key));
+                it.second = replaced_frame;
+            }
         }
-        pair<int, string> page_faults = {INT32_MAX, ""};
-        for(auto const& it:results){
-            page_faults = page_faults.first > it.first ? it : page_faults;
-        }
-        return {page_faults.first + 1, page_faults.second};
+        return {0,""};
     }
     void print_optimal_steps(const string& processes, const string& steps){
         unordered_map<char, int> processes_in_frames;
