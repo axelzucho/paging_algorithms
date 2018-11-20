@@ -62,6 +62,7 @@ private:
         return {0,""};
     }
     void print_optimal_steps(const string& processes, const string& steps){
+        cout << "Sequence of replacements made: " << "\n";
         unordered_map<char, int> processes_in_frames;
         int occupied_frames = 0;
         int current_index = 0;
@@ -101,6 +102,8 @@ public:
         }
 
         char process;
+
+        cout << "Sequence of replacements made: " << "\n";
 
         while(file >> process){
             if(process > 'Z' || process < 'A') continue;
@@ -145,6 +148,8 @@ public:
         }
 
         char process;
+
+        cout << "Sequence of replacements made: " << "\n";
 
         while(file >> process){
             if(process > 'Z' || process < 'A') continue;
